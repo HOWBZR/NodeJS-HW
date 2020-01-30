@@ -2,8 +2,8 @@ const inquirer = require('inquirer')
 const fs = require('fs')
 const axios = require('axios')
 const generateHTML = require('./generateHTML')
-const client_id = 'a787d50654fa42da7c11'
-const client_secret = '2f2e40aa3a38996b1993a4523047c1977d016f95'
+const convertFactory = require('electron-html-to')
+const path = require('path')
 
 
 inquirer
@@ -11,10 +11,10 @@ inquirer
         type: 'list',
         message: 'What is your favorite color?',
         choices: [
-            'Red',
-            'Green',
-            'Yellow',
-            'Blue',
+            'red',
+            'green',
+            'pink',
+            'blue',
         ],
         name: 'color'
     },
@@ -27,13 +27,39 @@ inquirer
         let color = response.color
         let username = response.username
 
-        console.log(username)
-        console.log(color)
         const queryURL = `https://api.github.com/users/${username}`;
 
-        axios.get(queryURL).then(function (data) {
-            console.log(data.data)
+        axios.get(queryURL).then(function (res) {
+
+            let datas = { color, ...res.data }
+            let html = generateHTML(datas)
+
+            const conversion = convertFactory({
+                converterPath: convertFactory.converters.PDF
+            })
+
+            fs.writeFile('index.html', html, function (err) {
+                if (err) {
+                    console.log(err)
+                } else {
+                    console.log('success')
+                }
+            });
+
+            conversion({ html }, function (err, result) {
+                if (err) {
+                    return console.log(err)
+                }
+                result.stream.pipe(
+                    fs.createWriteStream(path.join(__dirname, 'github.pdf'))
+                )
+                conversion.kill()
+            })
+
+
         });
+
+
 
 
 

@@ -18,6 +18,9 @@
   "homepage": "https://github.com/HOWBZR/NodeJS-HW#readme",
   "dependencies": {
     "axios": "^0.19.2",
-    "inquirer": "^7.0.3"
+    "electron": "^7.1.10",
+    "electron-html-to": "^2.6.0",
+    "inquirer": "^7.0.3",
+    "path": "^0.12.7"
   }
 }
